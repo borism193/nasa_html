@@ -15,20 +15,29 @@ def pedir_datos(direccion,llave)
     https.verify_mode = OpenSSL::SSL::VERIFY_PEER
     response = https.request(request)
 
-    json = JSON.parse(response.read_body)
-    return json["photos"].map{ |filter| filter["img_src"]}
     
+  while response.code != "200"
+    puts "Error coneccion re intentando"
+  end
+
+  
+  json = JSON.parse(response.read_body)
+
+  return json["photos"].map{ |filter| filter["img_src"]} #pensaba que era solo un array dentro de un hash y era un hash dentro de um array dentro de un hash 5 horas perdidas 
+
 end
 
 
 def build_web_page(img)
-  html = "<html>\n<head>\n</head>\n<body>\n<ul>"
+  html = "<html>\n<head>\n</head>\n<body>\n<ul>\n"
+  img.each do |a|
+    html += "     <li><img src='#{a}'></li>\n"
+  end
   html += "</ul>\n</body>\n</html>"
   return html
 end
 
 
-#build_web_page(pedir_datos(url,key))
 json = pedir_datos(url_n,key)
-#fotos = build_web_page(json) 
-#File.write('fotos_nasa.html', fotos)
+fotos = build_web_page(json) 
+File.write('fotos_nasa.html', fotos)
